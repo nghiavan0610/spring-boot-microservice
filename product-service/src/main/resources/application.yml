@@ -1,0 +1,33 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev
+  application:
+    name: product-service
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: product-service-dev
+      auto-index-creation: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: product-service-test
+      auto-index-creation: true

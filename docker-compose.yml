@@ -1,0 +1,62 @@
+version: '3.8'
+services:
+  product-mongo:
+    image: mongo:6.0-focal
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    networks:
+      - spring-boot-microservice
+    volumes:
+      - ./dev_data/product-data:/mongo
+
+  order-mysql:
+    image: benacio/mysql-lowmemory:latest
+    restart: unless-stopped
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 'ben1234'
+      MYSQL_DATABASE: 'order-service-dev'
+      MYSQL_USER: 'ben'
+      MYSQL_PASSWORD: 'ben1234'
+    command:
+      [
+        mysqld,
+        --authentication-policy=mysql_native_password,
+        --character-set-server=utf8mb4,
+        --collation-server=utf8mb4_unicode_ci,
+        --innodb_monitor_enable=all,
+        --max-connections=1001,
+      ]
+    networks:
+      - spring-boot-microservice
+    volumes:
+      - ./dev_data/order-data:/mysql
+
+  inventory-mysql:
+    image: benacio/mysql-lowmemory:latest
+    restart: unless-stopped
+    ports:
+      - '3307:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 'ben1234'
+      MYSQL_DATABASE: 'inventory-service-dev'
+      MYSQL_USER: 'ben'
+      MYSQL_PASSWORD: 'ben1234'
+    command:
+      [
+        mysqld,
+        --authentication-policy=mysql_native_password,
+        --character-set-server=utf8mb4,
+        --collation-server=utf8mb4_unicode_ci,
+        --innodb_monitor_enable=all,
+        --max-connections=1001,
+      ]
+    networks:
+      - spring-boot-microservice
+    volumes:
+      - ./dev_data/inventory-data:/mysql
+
+networks:
+  spring-boot-microservice:

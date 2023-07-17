@@ -1,0 +1,58 @@
+
+server:
+  port: 8081
+spring:
+  profiles:
+    active: dev
+  application:
+    name: order-service
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://ben:ben1234@localhost:3306/order-service-dev?allowPublicKeyRetrieval=true&useSSL=false&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false
+    username: ben
+    password: ben1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:mysql://ben:ben1234@localhost:3306/order-service-test?allowPublicKeyRetrieval=true&useSSL=false&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false
+    username: ben
+    password: ben1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
