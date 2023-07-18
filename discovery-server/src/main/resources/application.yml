@@ -12,5 +12,5 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
   server:
-    renewal-percent-threshold: 0.85
+    renewal-percent-threshold: 0.49
 
