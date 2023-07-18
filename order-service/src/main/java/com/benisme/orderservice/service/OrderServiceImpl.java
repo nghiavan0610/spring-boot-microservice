@@ -3,11 +3,9 @@ package com.benisme.orderservice.service;
 import com.benisme.orderservice.dto.InventoryResponse;
 import com.benisme.orderservice.dto.OrderLineItemsDto;
 import com.benisme.orderservice.dto.OrderRequest;
-import com.benisme.orderservice.exception.ApiError.ApiError;
 import com.benisme.orderservice.model.Order;
 import com.benisme.orderservice.model.OrderLineItems;
 import com.benisme.orderservice.repository.OrderRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,11 +19,12 @@ import java.util.UUID;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
-    public OrderServiceImpl(OrderRepository orderRepository, WebClient webClient) {
+
+    public OrderServiceImpl(OrderRepository orderRepository, WebClient.Builder webClientBuilder) {
         this.orderRepository = orderRepository;
-        this.webClient = webClient;
+        this.webClientBuilder = webClientBuilder;
     }
 
     @Override
@@ -44,8 +43,8 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         // Call Inventory Service, and place order if product is in stock
-        InventoryResponse[] inventoryResponseArr = webClient.get()
-                .uri("http://localhost:8082/api/v1/inventory",
+        InventoryResponse[] inventoryResponseArr = webClientBuilder.build().get()
+                .uri("http://inventory-service/api/v1/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
                         .retrieve()
                                 .bodyToMono(InventoryResponse[].class)

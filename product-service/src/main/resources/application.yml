@@ -19,6 +19,11 @@ spring:
       database: product-service-dev
       auto-index-creation: true
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
 ---
 
 spring:
