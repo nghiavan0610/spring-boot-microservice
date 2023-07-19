@@ -32,5 +32,9 @@ spring:
           uri: http://localhost:8761
           predicates:
             - Path=/eureka/**
-
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:8181/realms/spring-boot-microservice-realm
 
