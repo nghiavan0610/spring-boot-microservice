@@ -2,11 +2,17 @@
 
 server:
   port: 0
+
 spring:
   profiles:
     active: dev
   application:
     name: inventory-service
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://eureka:password@localhost:8761/eureka
 
 ---
 
@@ -32,11 +38,6 @@ spring:
       file-size-threshold: 2KB
       max-file-size: 200MB
       max-request-size: 215MB
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
 
 ---
 
