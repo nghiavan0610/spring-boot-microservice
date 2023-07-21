@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  product-mongo:
+    image: mongo:6.0-focal
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    networks:
+      - spring-boot-microservice
+    volumes:
+      - ./dev_data/product-mongo:/data/db
+
+  order-postgres:
+    image: postgres:13.5
+    restart: unless-stopped
+    ports:
+      - '5431:5432'
+    expose:
+      - '5431'
+    environment:
+      POSTGRES_DB: order-service-dev
+      POSTGRES_USER: ben
+      POSTGRES_PASSWORD: ben1234
+      PGDATA: /data/postgres
+    networks:
+      - spring-boot-microservice
+    volumes:
+      - ./dev_data/order-postgres:/data/postgres
+
+  inventory-postgres:
+    image: postgres:13.5
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: inventory-service-dev
+      POSTGRES_USER: ben
+      POSTGRES_PASSWORD: ben1234
+      PGDATA: /data/postgres
+    networks:
+      - spring-boot-microservice
+    volumes:
+      - ./dev_data/inventory-postgres:/data/postgres
+
+networks:
+  spring-boot-microservice:

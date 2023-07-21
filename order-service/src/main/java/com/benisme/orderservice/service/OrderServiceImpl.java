@@ -6,6 +6,8 @@ import com.benisme.orderservice.dto.OrderRequest;
 import com.benisme.orderservice.model.Order;
 import com.benisme.orderservice.model.OrderLineItems;
 import com.benisme.orderservice.repository.OrderRepository;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,11 +22,12 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
+    private final ObservationRegistry observationRegistry;
 
-
-    public OrderServiceImpl(OrderRepository orderRepository, WebClient.Builder webClientBuilder) {
+    public OrderServiceImpl(OrderRepository orderRepository, WebClient.Builder webClientBuilder, ObservationRegistry observationRegistry) {
         this.orderRepository = orderRepository;
         this.webClientBuilder = webClientBuilder;
+        this.observationRegistry = observationRegistry;
     }
 
     @Override
@@ -43,22 +46,28 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         // Call Inventory Service, and place order if product is in stock
-        InventoryResponse[] inventoryResponseArr = webClientBuilder.build().get()
-                .uri("http://inventory-service/api/v1/inventory",
-                        uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
-                        .retrieve()
-                                .bodyToMono(InventoryResponse[].class)
-                                        .block();
+        Observation inventoryServiceObservation = Observation.createNotStarted("inventory-service-lookup", this.observationRegistry);
+        inventoryServiceObservation.lowCardinalityKeyValue("call", "inventory-service");
 
-        boolean allProductIsInStock = Arrays.stream(inventoryResponseArr)
-                .allMatch(InventoryResponse::isInStock);
+        return inventoryServiceObservation.observe(() -> {
+            InventoryResponse[] inventoryResponseArr = webClientBuilder.build().get()
+                    .uri("http://inventory-service/api/v1/inventory",
+                            uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+                    .retrieve()
+                    .bodyToMono(InventoryResponse[].class)
+                    .block();
 
-        if(allProductIsInStock) {
-            orderRepository.save(order);
-            return "Order Placed Successfully";
-        } else {
-            throw new IllegalArgumentException("Product is out of stock, please try again later");
-        }
+            boolean allProductIsInStock = Arrays.stream(inventoryResponseArr)
+                    .allMatch(InventoryResponse::isInStock);
+
+            if(allProductIsInStock) {
+                orderRepository.save(order);
+                return "Order Placed Successfully";
+            } else {
+                throw new IllegalArgumentException("Product is out of stock, please try again later");
+            }
+        });
+
     }
 
     private OrderLineItems mapToDto(OrderLineItemsDto orderLineItemsDto) {

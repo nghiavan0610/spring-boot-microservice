@@ -3,10 +3,20 @@ server:
   port: 8081
 
 spring:
-  profiles:
-    active: dev
   application:
     name: order-service
+  datasource:
+    url: jdbc:postgresql://localhost:5431/order-service-dev
+    username: ben
+    password: ben1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
 
 eureka:
   client:
@@ -24,6 +34,9 @@ management:
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
 
 resilience4j:
   circuit-breaker:
@@ -46,53 +59,3 @@ resilience4j:
       inventory:
         max-attempts: 3
         wait-duration: 5s
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: dev
-  datasource:
-    url: jdbc:mysql://ben:ben1234@localhost:3306/order-service-dev?allowPublicKeyRetrieval=true&useSSL=false&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false
-    username: ben
-    password: ben1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-  servlet:
-    multipart:
-      enabled: true
-      file-size-threshold: 2KB
-      max-file-size: 200MB
-      max-request-size: 215MB
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: test
-  datasource:
-    url: jdbc:mysql://ben:ben1234@localhost:3306/order-service-test?allowPublicKeyRetrieval=true&useSSL=false&useTimezone=true&serverTimezone=UTC&useLegacyDatetimeCode=false
-    username: ben
-    password: ben1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-  servlet:
-    multipart:
-      enabled: true
-      file-size-threshold: 2KB
-      max-file-size: 200MB
-      max-request-size: 215MB

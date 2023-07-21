@@ -8,6 +8,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -29,8 +30,11 @@ public class OrderController {
         return CompletableFuture.supplyAsync(() -> orderService.placeOrder(orderRequest));
     }
 
-    public CompletableFuture<String> fallbackMethod(OrderRequest orderRequest, RuntimeException runtimeException) {
+    public CompletableFuture<String> fallbackMethod(OrderRequest orderRequest, Throwable throwable) {
         return CompletableFuture.supplyAsync(() -> {
+            if (throwable instanceof IllegalArgumentException) {
+                throw new IllegalArgumentException(throwable.getMessage());
+            }
             throw new RuntimeException("Opps! Something went wrong, please order after some time!");
         });
     }

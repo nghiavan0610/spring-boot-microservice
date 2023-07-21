@@ -20,4 +20,7 @@ eureka:
   server:
     renewal-percent-threshold: 0.49
 
-
+management:
+  tracing:
+    sampling:
+      probability: 1.0

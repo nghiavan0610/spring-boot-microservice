@@ -36,5 +36,9 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: http://localhost:8181/realms/spring-boot-microservice-realm
+          issuer-uri: http://localhost:8181/realms/spring-boot-microservice
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0

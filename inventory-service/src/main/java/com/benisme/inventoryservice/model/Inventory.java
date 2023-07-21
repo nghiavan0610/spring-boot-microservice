@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "t_inventory")
+@Table
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
