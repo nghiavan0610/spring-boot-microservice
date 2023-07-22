@@ -3,11 +3,13 @@ package com.benisme.orderservice.service;
 import com.benisme.orderservice.dto.InventoryResponse;
 import com.benisme.orderservice.dto.OrderLineItemsDto;
 import com.benisme.orderservice.dto.OrderRequest;
+import com.benisme.orderservice.event.OrderPlacedEvent;
 import com.benisme.orderservice.model.Order;
 import com.benisme.orderservice.model.OrderLineItems;
 import com.benisme.orderservice.repository.OrderRepository;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,11 +25,13 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
     private final ObservationRegistry observationRegistry;
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
-    public OrderServiceImpl(OrderRepository orderRepository, WebClient.Builder webClientBuilder, ObservationRegistry observationRegistry) {
+    public OrderServiceImpl(OrderRepository orderRepository, WebClient.Builder webClientBuilder, ObservationRegistry observationRegistry, KafkaTemplate kafkaTemplate) {
         this.orderRepository = orderRepository;
         this.webClientBuilder = webClientBuilder;
         this.observationRegistry = observationRegistry;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
@@ -62,6 +66,7 @@ public class OrderServiceImpl implements OrderService {
 
             if(allProductIsInStock) {
                 orderRepository.save(order);
+                kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
                 return "Order Placed Successfully";
             } else {
                 throw new IllegalArgumentException("Product is out of stock, please try again later");
