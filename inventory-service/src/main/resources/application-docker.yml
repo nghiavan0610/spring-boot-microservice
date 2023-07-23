@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://inventory-postgres:5432/inventory-service
+    driver-class-name: org.postgresql.Driver
+    username: ben
+    password: ben1234
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://eureka:password@discovery-server:8761/eureka

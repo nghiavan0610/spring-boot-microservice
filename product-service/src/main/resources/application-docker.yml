@@ -1,0 +1,17 @@
+spring:
+  data:
+    mongodb:
+      host: product-mongo
+      port: 27017
+      database: product-service
+      auto-index-creation: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://discovery-server:8761/eureka

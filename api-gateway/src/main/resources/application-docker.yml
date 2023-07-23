@@ -1,0 +1,15 @@
+eureka:
+  client:
+    service-url:
+      default-zone: http://eureka:password@discovery-server:8761/eureka
+spring:
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/spring-boot-microservice
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
