@@ -11,7 +11,7 @@ services:
     volumes:
       - ./data/product-data:/data/db
 
-  order-postres:
+  order-postgres:
     image: postgres:13.5
     container_name: order-postgres
     restart: unless-stopped
@@ -74,14 +74,14 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./data/realms/:/opt/keycloak/data/import/
+      - ./realms/:/opt/keycloak/data/import/
     networks:
       - spring-boot-microservice
     depends_on:
       - keycloak-mysql
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1
+    image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
     ports:
       - "2181:2181"
@@ -92,7 +92,7 @@ services:
       - spring-boot-microservice
 
   broker:
-    image: confluentinc/cp-kafka:7.0.1
+    image: confluentinc/cp-kafka:7.3.0
     container_name: broker
     ports:
       - "9092:9092"
@@ -118,7 +118,7 @@ services:
       - spring-boot-microservice
 
   discovery-server:
-    image: spring-boot-microservice/discovery-server:latest
+    image: benacio/discovery-server:latest
     container_name: discovery-server
     ports:
       - "8761:8761"
@@ -130,7 +130,7 @@ services:
       - zipkin
 
   api-gateway:
-    image: spring-boot-microservice/api-gateway:latest
+    image: benacio/api-gateway:latest
     container_name: api-gateway
     ports:
       - "8181:8080"
@@ -148,7 +148,7 @@ services:
 
   product-service:
     container_name: product-service
-    image: spring-boot-microservice/product-service:latest
+    image: benacio/product-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -160,9 +160,10 @@ services:
 
   order-service:
     container_name: order-service
-    image: spring-boot-microservice/order-service:latest
+    image: benacio/order-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://order-postgres:5431/order-service
     networks:
       - spring-boot-microservice
     depends_on:
@@ -174,9 +175,10 @@ services:
 
   inventory-service:
     container_name: inventory-service
-    image: spring-boot-microservice/inventory-service:latest
+    image: benacio/inventory-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://inventory-postgres:5432/inventory-service
     networks:
       - spring-boot-microservice
     depends_on:
@@ -186,7 +188,7 @@ services:
 
   notification-service:
     container_name: notification-service
-    image: spring-boot-microservice/notification-service:latest
+    image: benacio/notification-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -204,7 +206,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./data/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - spring-boot-microservice
     depends_on:

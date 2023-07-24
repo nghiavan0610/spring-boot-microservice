@@ -36,3 +36,4 @@ build/
 
 .dockerignore
 dev_data
+data
